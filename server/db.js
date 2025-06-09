@@ -1,11 +1,11 @@
 const { Pool } = require('pg');
+require('dotenv').config(); // Load .env file
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'academic_assistance',
-  password: '1019', // Replace with your PostgreSQL password
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Required for most cloud DBs like Render
+  },
 });
 
 async function initializeDatabase() {
@@ -47,7 +47,7 @@ async function initializeDatabase() {
     console.log('Database initialized successfully');
   } catch (err) {
     console.error('Database initialization failed:', err);
-    throw err; // This will stop the server if initialization fails
+    throw err;
   }
 }
 
