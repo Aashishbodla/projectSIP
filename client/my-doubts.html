@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Doubts | StudyConnect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .doubt-card { transition: all 0.3s ease; }
+    .doubt-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html" class="flex items-center space-x-2">
+        <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+        <span class="text-xl font-bold text-gray-800">StudyConnect</span>
+      </a>
+      <div class="flex items-center space-x-4" id="authNav"></div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">My Doubts</h1>
+      <p class="text-gray-600 max-w-2xl mx-auto">View and manage the doubts you’ve posted and their responses.</p>
+    </div>
+
+    <!-- Doubts List -->
+    <div id="doubtList" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"></div>
+    <div id="noResults" class="text-center py-12 hidden">
+      <h3 class="text-xl font-medium text-gray-700">No doubts found</h3>
+      <p class="text-gray-500">Post a doubt to get started!</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { auth } from './js/auth.js';
+    import { api } from './js/api.js';
+    import { utils } from './js/main.js';
+
+    window.auth = auth;
+    window.api = api;
+    window.utils = utils;
+
+    if (!auth.requireAuth()) window.location.href = 'login.html';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const authNav = document.getElementById('authNav');
+      const currentUser = auth.getCurrentUser();
+      if (currentUser) {
+        authNav.innerHTML = `
+          <span class="text-sm text-gray-600">Hello, ${currentUser.name}</span>
+          <a href="post-doubt.html" class="text-sm text-purple-600 hover:text-purple-800 ml-2">Post Doubt</a>
+          <a href="my-doubts.html" class="text-sm text-purple-600 hover:text-purple-800 ml-2">My Doubts</a>
+          <button onclick="auth.logout()" class="text-sm text-purple-600 hover:text-purple-800 ml-2">Logout</button>
+        `;
+      }
+
+      loadDoubts();
+    });
+
+    async function loadDoubts() {
+      try {
+        const currentUser = auth.getCurrentUser();
+        const doubts = await api.getMyDoubts(currentUser.user_id);
+        const container = document.getElementById('doubtList');
+        const noResults = document.getElementById('noResults');
+        container.innerHTML = '';
+
+        if (doubts.length === 0) {
+          noResults.classList.remove('hidden');
+          return;
+        }
+
+        noResults.classList.add('hidden');
+        doubts.forEach(doubt => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-4 rounded-lg shadow-md doubt-card';
+          card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+              <span class="inline-block px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded-full">
+                ${doubt.branch || 'General'}
+              </span>
+              <span class="text-xs text-gray-500">${utils.formatDate(doubt.created_at)}</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">${doubt.subject}</h3>
+            <p class="text-sm text-gray-600 mb-4">${utils.truncateText(doubt.description)}</p>
+            <button onclick="viewResponses(${doubt.id})" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+              <i class="fas fa-comments mr-2"></i> View Responses (${doubt.response_count || 0})
+            </button>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        utils.showToast('Failed to load doubts', 'error');
+        console.error('Error loading doubts:', error);
+      }
+    }
+
+    window.viewResponses = (doubtId) => {
+      window.location.href = `view-responses.html?id=${doubtId}`;
+    };
+  </script>
+</body>
+</html>

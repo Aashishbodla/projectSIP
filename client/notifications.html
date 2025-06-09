@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications</title>
+  <script src="https://cdn.tailwindcss.com"></script> <!-- For styling -->
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-3xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">Your Notifications</h1>
+    <table class="min-w-full text-center border-collapse">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="py-2 px-4 border">Notification ID</th>
+          <th class="py-2 px-4 border">Message</th>
+          <th class="py-2 px-4 border">Type</th>
+          <th class="py-2 px-4 border">Doubt ID</th>
+        </tr>
+      </thead>
+      <tbody id="notificationsTable" class="text-gray-700">
+        <!-- Notifications will appear here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Change this URL to your backend API that fetches notifications
+    const loggedInUserId = 'sachin123'; // (this should be dynamic based on login)
+    const apiUrl = `http://localhost:5000/api/notifications/${loggedInUserId}`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.getElementById('notificationsTable');
+
+        if (data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="4" class="py-4">No notifications found.</td></tr>`;
+          return;
+        }
+
+        data.forEach(notification => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="py-2 px-4 border">${notification.notification_id}</td>
+            <td class="py-2 px-4 border">${notification.message}</td>
+            <td class="py-2 px-4 border">${notification.type}</td>
+            <td class="py-2 px-4 border">${notification.doubt_id}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching notifications:', error);
+      });
+  </script>
+
+</body>
+</html>

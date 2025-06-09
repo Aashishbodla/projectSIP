@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solve Doubts | StudyConnect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .doubt-card { transition: all 0.3s ease; }
+    .doubt-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html" class="flex items-center space-x-2">
+        <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+        <span class="text-xl font-bold text-gray-800">StudyConnect</span>
+      </a>
+      <div class="flex items-center space-x-4" id="authNav"></div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Help Your Peers</h1>
+      <p class="text-gray-600 max-w-2xl mx-auto">Browse academic doubts and offer to connect offline to assist.</p>
+    </div>
+
+    <!-- Doubts List -->
+    <div id="doubtList" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"></div>
+    <div id="noResults" class="text-center py-12 hidden">
+      <h3 class="text-xl font-medium text-gray-700">No doubts found</h3>
+      <p class="text-gray-500">Check back later or post your own doubt!</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { auth } from './js/auth.js';
+    import { api } from './js/api.js';
+    import { utils } from './js/main.js';
+
+    window.auth = auth;
+    window.api = api;
+    window.utils = utils;
+
+    if (!auth.requireAuth()) window.location.href = 'login.html';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const authNav = document.getElementById('authNav');
+      const currentUser = auth.getCurrentUser();
+      if (currentUser) {
+        authNav.innerHTML = `
+          <span class="text-sm text-gray-600">Hello, ${currentUser.name}</span>
+          <button onclick="auth.logout()" class="text-sm text-purple-600 hover:text-purple-800">Logout</button>
+        `;
+      }
+
+      loadDoubts();
+    });
+
+    async function loadDoubts() {
+      try {
+        const doubts = await api.getDoubts();
+        const container = document.getElementById('doubtList');
+        const noResults = document.getElementById('noResults');
+        container.innerHTML = '';
+
+        if (doubts.length === 0) {
+          noResults.classList.remove('hidden');
+          return;
+        }
+
+        noResults.classList.add('hidden');
+        doubts.forEach(doubt => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-4 rounded-lg shadow-md doubt-card';
+          card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+              <span class="inline-block px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded-full">
+                ${doubt.branch || 'General'}
+              </span>
+              <span class="text-xs text-gray-500">${utils.formatDate(doubt.created_at)}</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">${doubt.subject}</h3>
+            <p class="text-sm text-gray-600 mb-4">${utils.truncateText(doubt.description)}</p>
+            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+                  <i class="fas fa-user text-sm"></i>
+                </div>
+                <span class="ml-2 text-sm text-gray-700">${doubt.name}</span>
+              </div>
+              <button onclick="viewResponses(${doubt.id})" class="text-purple-600 hover:text-purple-800 text-sm">
+                <i class="fas fa-comments mr-1"></i> View Responses
+              </button>
+            </div>
+            <button onclick="respond(${doubt.id})" class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+              <i class="fas fa-reply mr-2"></i> Respond
+            </button>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        utils.showToast('Failed to load doubts', 'error');
+        console.error('Error loading doubts:', error);
+      }
+    }
+
+    window.viewResponses = (doubtId) => {
+      window.location.href = `view-responses.html?id=${doubtId}`;
+    };
+
+    window.respond = async (doubtId) => {
+      const message = prompt('How can you help? (e.g., "I can meet you at the library")');
+      if (!message) return;
+      const contactInfo = prompt('Your contact info (e.g., email/phone, optional):');
+      try {
+        await api.postResponse({
+          doubt_id: doubtId,
+          message,
+          contact_info: contactInfo || null
+        });
+        utils.showToast('Response submitted successfully!');
+        loadDoubts();
+      } catch (error) {
+        utils.showToast('Failed to submit response', 'error');
+        console.error('Error submitting response:', error);
+      }
+    };
+  </script>
+</body>
+</html>

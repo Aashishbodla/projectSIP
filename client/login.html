@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | StudyConnect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Particles.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <!-- Vanilla Tilt CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+  <style>
+    /* High-Contrast Dark Background with Animated Gradient */
+    body {
+      background: linear-gradient(135deg, #1F1A44, #2E236C, #433D8B, #1F1A44);
+      background-size: 400%;
+      animation: gradientShift 15s ease infinite;
+      overflow: hidden;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Particles Container */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    /* 3D Floating Spheres with Neon Glow */
+    .sphere {
+      position: absolute;
+      background: radial-gradient(circle, rgba(147, 51, 234, 0.5), rgba(59, 130, 246, 0.2));
+      border-radius: 50%;
+      animation: floatSphere 20s infinite ease-in-out;
+      box-shadow: 0 0 30px rgba(147, 51, 234, 0.8);
+      transform-style: preserve-3d;
+      z-index: 1;
+    }
+    @keyframes floatSphere {
+      0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+      50% { transform: translateY(-50vh) rotateX(360deg) rotateY(360deg); }
+    }
+    /* Typewriter Effect for Heading with Neon Glow */
+    #login-heading {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #9333EA;
+      animation: typing 2s steps(20, end), blink 0.75s step-end infinite;
+      color: #F3E8FF;
+      text-shadow: 0 0 10px rgba(147, 51, 234, 0.8);
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+    /* High-Contrast Form Inputs with Neon Glow */
+    .input-container {
+      position: relative;
+    }
+    input {
+      transition: all 0.3s ease;
+      border: 2px solid #4B4A67;
+      background: rgba(31, 26, 68, 0.8);
+      color: #EDE9FE;
+      caret-color: #3B82F6;
+    }
+    input::placeholder {
+      color: #A5A3B7;
+    }
+    input:focus {
+      border-color: #9333EA;
+      box-shadow: 0 0 15px rgba(147, 51, 234, 0.8);
+      transform: scale(1.02);
+    }
+    .validation-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+    }
+    .validation-message {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    /* Form Container with Neon Border */
+    .form-container {
+      background: rgba(31, 26, 68, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+      border: 1px solid #9333EA;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .form-container.glow {
+      box-shadow: 0 0 30px rgba(147, 51, 234, 0.9);
+      border-color: #3B82F6;
+    }
+    /* Shake Animation on Error */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-5px); }
+    }
+    .shake {
+      animation: shake 0.5s ease;
+    }
+    /* Login Button with Neon Effect */
+    .login-button {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      background: #9333EA;
+      color: #F3E8FF;
+      text-shadow: 0 0 5px rgba(147, 51, 234, 0.8);
+    }
+    .login-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+      transition: 0.5s;
+    }
+    .login-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+      background: #3B82F6;
+    }
+    .login-button:hover::after {
+      left: 100%;
+    }
+    /* Fade-in for Form Elements */
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 1s ease-in forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    /* High-Contrast Links */
+    a {
+      position: relative;
+      transition: all 0.3s ease;
+      color: #D8B4FE;
+    }
+    a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -2px;
+      left: 0;
+      background: #3B82F6;
+      transition: width 0.3s ease;
+    }
+    a:hover {
+      color: #3B82F6;
+      text-shadow: 0 0 5px rgba(59, 130, 246, 0.8);
+    }
+    a:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative">
+  <!-- Interactive Particles -->
+  <div id="particles-js"></div>
+  <!-- 3D Floating Spheres -->
+  <div class="sphere w-12 h-12 top-10 left-10"></div>
+  <div class="sphere w-16 h-16 top-20 right-20"></div>
+  <div class="sphere w-10 h-10 bottom-30 left-30"></div>
+
+  <!-- Login Form -->
+  <div class="form-container p-8 rounded-lg w-full max-w-md z-10" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-perspective="1000">
+    <h1 id="login-heading" class="text-2xl font-bold text-center mb-6">Login</h1>
+    <form id="loginForm" class="space-y-4">
+      <div class="input-container fade-in">
+        <label class="block text-sm font-medium text-gray-200 mb-1">Username*</label>
+        <input type="text" id="username" required class="w-full px-3 py-2 border rounded-lg focus:outline-none" placeholder="Enter your username">
+        <i class="fas fa-check-circle text-green-400 validation-icon" id="username-icon"></i>
+        <i class="fas fa-exclamation-circle text-red-400 validation-icon" id="username-error-icon"></i>
+        <p id="username-message" class="validation-message text-green-400"></p>
+        <p id="username-error-message" class="validation-message text-red-400"></p>
+      </div>
+      <div class="input-container fade-in" style="animation-delay: 0.2s;">
+        <label class="block text-sm font-medium text-gray-200 mb-1">Password*</label>
+        <input type="password" id="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none" placeholder="Enter your password">
+        <i class="fas fa-check-circle text-green-400 validation-icon" id="password-icon"></i>
+        <i class="fas fa-exclamation-circle text-red-400 validation-icon" id="password-error-icon"></i>
+        <p id="password-message" class="validation-message text-green-400"></p>
+        <p id="password-error-message" class="validation-message text-red-400"></p>
+      </div>
+      <button type="submit" class="w-full py-2 rounded-lg login-button fade-in" style="animation-delay: 0.4s;">Login</button>
+    </form>
+    <p class="mt-4 text-center text-sm text-gray-300 fade-in" style="animation-delay: 0.6s;">
+      Don't have an account? <a href="register.html">Register here</a><br>
+      <a href="forgot-password.html">Forgot Password?</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { auth } from './js/auth.js';
+    import { api } from './js/api.js';
+
+    window.auth = auth;
+    window.api = api;
+
+    // DOM Elements
+    const formContainer = document.querySelector('.form-container');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const usernameIcon = document.getElementById('username-icon');
+    const usernameErrorIcon = document.getElementById('username-error-icon');
+    const usernameMessage = document.getElementById('username-message');
+    const usernameErrorMessage = document.getElementById('username-error-message');
+    const passwordIcon = document.getElementById('password-icon');
+    const passwordErrorIcon = document.getElementById('password-error-icon');
+    const passwordMessage = document.getElementById('password-message');
+    const passwordErrorMessage = document.getElementById('password-error-message');
+    const loginForm = document.getElementById('loginForm');
+
+    // Initialize Particles.js
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 50, density: { enable: true, value_area: 800 } },
+        color: { value: ['#9333EA', '#3B82F6'] },
+        shape: { type: 'circle' },
+        opacity: { value: 0.7, random: true },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: '#A78BFA', opacity: 0.5, width: 1 },
+        move: { enable: true, speed: 2, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: {
+          onhover: { enable: true, mode: 'grab' },
+          onclick: { enable: true, mode: 'push' },
+          resize: true
+        },
+        modes: {
+          grab: { distance: 200, line_linked: { opacity: 1 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+
+    // Particle Burst on Form Hover
+    formContainer.addEventListener('mouseenter', () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 20 },
+          color: { value: '#3B82F6' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.8, anim: { enable: true, speed: 1, opacity_min: 0 } },
+          size: { value: 5, random: true },
+          move: { enable: true, speed: 5, direction: 'none', random: true, out_mode: 'out' }
+        }
+      });
+    });
+
+    // Initialize Vanilla Tilt with Glow Effect
+    VanillaTilt.init(formContainer, {
+      max: 15,
+      speed: 400,
+      perspective: 1000,
+      glare: true,
+      'max-glare': 0.5
+    });
+    formContainer.addEventListener('tiltChange', (e) => {
+      const tiltX = e.detail.tiltX;
+      const tiltY = e.detail.tiltY;
+      const tiltAngle = Math.abs(tiltX) + Math.abs(tiltY);
+      const glowIntensity = tiltAngle / 30;
+      formContainer.style.boxShadow = `0 0 ${20 + glowIntensity * 20}px rgba(147, 51, 234, ${0.5 + glowIntensity * 0.3})`;
+    });
+
+    // Real-Time Input Validation
+    const validateUsername = (value) => {
+      if (value.length >= 3) {
+        usernameIcon.style.display = 'block';
+        usernameErrorIcon.style.display = 'none';
+        usernameMessage.style.display = 'block';
+        usernameMessage.textContent = 'Looks good!';
+        usernameErrorMessage.style.display = 'none';
+      } else {
+        usernameIcon.style.display = 'none';
+        usernameErrorIcon.style.display = 'block';
+        usernameMessage.style.display = 'none';
+        usernameErrorMessage.style.display = 'block';
+        usernameErrorMessage.textContent = 'Username must be at least 3 characters';
+      }
+    };
+
+    const validatePassword = (value) => {
+      if (value.length >= 6) {
+        passwordIcon.style.display = 'block';
+        passwordErrorIcon.style.display = 'none';
+        passwordMessage.style.display = 'block';
+        passwordMessage.textContent = 'Looks good!';
+        passwordErrorMessage.style.display = 'none';
+      } else {
+        passwordIcon.style.display = 'none';
+        passwordErrorIcon.style.display = 'block';
+        passwordMessage.style.display = 'none';
+        passwordErrorMessage.style.display = 'block';
+        passwordErrorMessage.textContent = 'Password must be at least 6 characters';
+      }
+    };
+
+    usernameInput.addEventListener('input', () => validateUsername(usernameInput.value));
+    passwordInput.addEventListener('input', () => validatePassword(passwordInput.value));
+
+    // Form Submission with Shake on Error
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = loginForm.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Logging in...';
+
+      try {
+        const credentials = {
+          username: usernameInput.value,
+          password: passwordInput.value
+        };
+        const { token, user } = await api.login(credentials);
+        console.log('Token:', token);
+        auth.login(token, user);
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || 'index.html';
+        window.location.href = redirect;
+      } catch (error) {
+        formContainer.classList.add('shake');
+        alert(error.message || 'Login failed');
+        console.error('Login error:', error);
+        const utterance = new SpeechSynthesisUtterance('Login failed. Please try again.');
+        utterance.rate = 1;
+        speechSynthesis.speak(utterance);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    });
+  </script>
+</body>
+</html>
