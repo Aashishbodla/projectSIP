@@ -4,7 +4,7 @@ require('dotenv').config(); // Load .env file
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Required for most cloud DBs like Render
+    rejectUnauthorized: false // Required for most cloud DBs like Render
   },
 });
 
